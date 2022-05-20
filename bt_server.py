@@ -37,14 +37,11 @@ class BTServer(object):
                 buffer = ''
 
                 while True:
-                    data = self.client.recv(1024).decode('utf-8')
+                    data = self.client.recv(1024)
                     print(data)
-                    buffer += data
-                    msgs = buffer.split("#")
-                    buffer = msgs[-1]
-                    for msg in msgs[:-1]:
-                        if msg:
-                            self.handleMessage(msg)
+                    msg = data.decode('utf-8')
+                    print(msg)
+                    self.handleMessage(msg)
 
             except IOError:
                 pass
@@ -61,8 +58,8 @@ class BTServer(object):
         self.client.send((message).encode('utf-8'))
 
     def handleMessage(self, message):
-        print(f"Sending response: 'Received msg: {message}'")
-        self.send(str("Received msg: " + message +"#"))
+        print(f"Received msg: {message}")
+        self.send(str("Received msg: " + message))
 
 def main():
     server = BTServer()
