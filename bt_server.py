@@ -32,9 +32,7 @@ class BTServer(object):
 
             try:
                 self.client, addr = server.accept()
-                print("Connected with: " +  str(addr))
-
-                buffer = ''
+                print("Connected with: " + str(addr))
 
                 while True:
                     data = self.client.recv(1024)
@@ -55,16 +53,17 @@ class BTServer(object):
                 break
 
     def send(self, message):
-        self.client.send((message).encode('utf-8'))
+        self.client.send(message.encode('utf-8'))
 
     def handleMessage(self, message):
         print(f"Received msg: {message}")
         self.send(str("Received msg: " + message))
 
+
+
 def main():
     server = BTServer()
     server.start()
-
 
 
 if __name__ == '__main__':
