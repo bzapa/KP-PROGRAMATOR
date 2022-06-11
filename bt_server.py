@@ -1,15 +1,25 @@
-import subprocess
-
 import bluetooth as bt
+import subprocess
+import threading
+from demo_store import get_files
+from message_utils import *
+from StreamParser import StreamParser
 
-class BTServer(object):
+class BTServer(threading.Thread):
 
     def __init__(self):
 
         self.uuid = "0446eb5c-d775-11ec-9d64-0242ac120002"
         self.client = None
+        self.stream_parser = StreamParser()
 
-    def start(self):
+        self.handlers = {
+            CLEAR: lambda msg: None,
+            GET_FILES_REQUEST: lambda msg: self.send(str(get_files()).encode(), JSON_DATA),
+            FLASH_REQUEST: lambda msg: print(msg[5:].decode("utf-8"))
+        }
+
+    def run(self):
 
         # must be discoverable to advertise
         subprocess.call(["bluetoothctl", "discoverable", "on"])
@@ -32,17 +42,16 @@ class BTServer(object):
 
             try:
                 self.client, addr = server.accept()
-                print("Connected with: " + str(addr))
+                print("Connected with: " +  str(addr))
 
                 while True:
                     data = self.client.recv(1024)
-                    print(data)
-                    msg = data.decode('utf-8')
-                    print(msg)
-                    self.handleMessage(msg)
+                    msg = self.stream_parser.parse(data)
+                    if msg:
+                        self.receiveMessage(msg)
 
-            except IOError:
-                pass
+            except IOError as e:
+                print(e)
             except KeyboardInterrupt:
                 if self.client is not None:
                     self.client.close()
@@ -52,20 +61,23 @@ class BTServer(object):
                 print("Server closing")
                 break
 
-    def send(self, message):
-        self.client.send(message.encode('utf-8'))
 
-    def handleMessage(self, message):
-        print(f"Received msg: {message}")
-        self.send(str("Received msg: " + message))
+    def send(self, message, msg_type):
+        message = prep_message(message, msg_type)       # adding header
+        # print(message[5:].decode('utf-8'))
+        self.client.send(message)
 
+
+    def receiveMessage(self, message):
+        self.handlers[int(message[0])](message)
 
 
 def main():
     server = BTServer()
-    server.start()
-
+    server.run()
+    #    print(str(get_files()))
+    #    print(len(str(get_files())))
+    #    print(len(str(get_files()).encode('utf-8')))
 
 if __name__ == '__main__':
     main()
-
