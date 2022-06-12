@@ -14,7 +14,7 @@ def pair_trust():
         if(res[0]=='y'):
             child.send("yes\ntrust\n")
     except:
-        print("Already connected or pairing declined on other device.")
+        print("Failed to pair.")
 
 
 if __name__=='__main__':

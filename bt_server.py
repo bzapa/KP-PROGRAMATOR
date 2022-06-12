@@ -8,6 +8,7 @@ from StreamParser import StreamParser
 class BTServer(threading.Thread):
 
     def __init__(self):
+        threading.Thread.__init__(self)
 
         self.uuid = "0446eb5c-d775-11ec-9d64-0242ac120002"
         self.client = None
