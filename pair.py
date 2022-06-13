@@ -62,14 +62,14 @@ class PairThread(threading.Thread):
         child.sendline('default-agent')
 
         # print("waiting for connection")
-        self.display_text = "connect now"
         fail = None
         try:
             self.state = AWAITING_CONNECTION
+            self.display_text = "connect now"
             child.expect("(yes/no)", timeout=20)
             print(child.before)
-            self.display_text = child.before[-17:-2]
             self.state = AWAITING_INPUT
+            self.display_text = child.before[-17:-2]
             self.event.wait()
             if self.decision == True:
                 child.send("yes\ntrust\n")
@@ -84,6 +84,6 @@ class PairThread(threading.Thread):
         self.state = INACTIVE
 
     def notify(self, decision):
-        print("decisoin", decision)
+        print("decision", decision)
         self.decision = decision
         self.event.set()

@@ -23,41 +23,46 @@ class OpenOCDSession(threading.Thread):
 
     def run(self):
         self.stdout, self.stderr = self.p.communicate()
-        # print(self.stderr)
-        # print(self.stdout)
 
 
-class SessionController:
+class SessionController(object):
     def __init__(self):
         self.tn = None
         self.is_open = False
         self.session = None
 
     def start_session(self, init_args):
+        if not self.session is None:
+            self.close()
         self.session = OpenOCDSession(args=init_args)
         self.session.start()
 
+        success = None
         for _ in range(100):
             time.sleep(0.1)
             try:
                 self.tn = telnetlib.Telnet("127.0.0.1", "4444")
-                response = 'Success'
+                success = True
                 break
             except:
-                response = 'Failed'
-            finally:
-                print(response)
+                success = False
 
+        if success == False:
+            return
         self.is_open = True
 
     def close(self):
+        if not self.is_open:
+            return None
         self.tn.write("shutdown\n".encode('utf8'))
-        result = self.tn.read_all()
+        result = None
+        try:
+            result = self.tn.read_all()
+        except:
+            pass
         self.is_open = False
         self.tn = None
         return result
 
     def send(self, msg):
         self.tn.write(msg.encode('utf8'))
-
-

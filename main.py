@@ -9,6 +9,7 @@ from gpiozero import Button
 
 import socket
 
+
 class TimeMenuItem(MenuItem):
     def __init__(self):
         MenuItem.__init__(self, None)
@@ -17,6 +18,7 @@ class TimeMenuItem(MenuItem):
     def visible_text(self):
         now = datetime.now()
         return now.strftime("%H:%M:%S")
+
 
 class CounterMenuItem(MenuItem):
     def __init__(self):
@@ -33,6 +35,7 @@ class CounterMenuItem(MenuItem):
         else:
             self.counter -= 1
 
+
 class IpMenuItem(MenuItem):
     def __init__(self):
         MenuItem.__init__(self, None)
@@ -45,6 +48,7 @@ class IpMenuItem(MenuItem):
             return str(s.getsockname()[0])
         except:
             return "Get IP error"
+
 
 def main():
     disp = Adafruit_SSD1306.SSD1306_128_32(rst=24)
@@ -66,7 +70,6 @@ def main():
         MenuItem("6 button"),
     ])
 
-
     btn_up.when_pressed = menu.on_up_btn
     btn_down.when_pressed = menu.on_down_btn
     btn_select.when_pressed = menu.on_select_btn
@@ -79,11 +82,12 @@ def main():
     draw = ImageDraw.Draw(image)
 
     while True:
-        draw.rectangle((0,0, 128, 32), outline=0, fill=0)
+        draw.rectangle((0, 0, 128, 32), outline=0, fill=0)
         menu.draw(draw)
 
         disp.image(image)
         disp.display()
+
 
 if __name__ == '__main__':
     main()

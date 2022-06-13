@@ -2,9 +2,9 @@ from SessionController import *
 
 if __name__ == "__main__":
     sc = SessionController()
-    sc.start_session(["-f", "/home/pi/openocd/tcl/interface/raspberrypi-native.cfg",
+    sc.start_session(["-f", "/home/pi/bootloader/my_rpi.cfg",
                       "-c", "transport select swd",
-                      "-c", "bcm2835gpio srst_num 24",
+                      #"-c", "bcm2835gpio srst_num 24",
                       "-f", "/home/pi/openocd/tcl/target/stm32f0x.cfg"])
     time.sleep(5)
     sc.send("halt reset\n")
