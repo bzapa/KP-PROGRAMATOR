@@ -35,6 +35,33 @@ class RequestHandler(object):
         service = RequestHandler(executor, session_controller)
         return service
 
+
+class Proxy(object):
+
+    def __init__(self, executor: futures.Executor, service: RequestHandler):
+        super().__init__()
+        self.executor = executor
+        self.service = service
+
+    def start_async(self, request, args):
+        return self.executor.submit(self.resend, request, args)
+
+    def resend(self, request, args):
+
+        print("[Proxy]", request, args)
+
+        res = self.service.start_async(request, args).result()
+
+        print(res)
+
+        return res
+
+    @staticmethod
+    def serve(service: FlashService) -> "Proxy":
+        executor = futures.ThreadPoolExecutor(max_workers=1)
+        proxy = Proxy(executor, service)
+        return proxy
+
 #
 # class RequestHandler(object):
 #
@@ -68,31 +95,7 @@ class RequestHandler(object):
 #         service = RequestHandler(executor, session_controller)
 #         return service
 
-class Proxy(object):
 
-    def __init__(self, executor: futures.Executor, service: RequestHandler):
-        super().__init__()
-        self.executor = executor
-        self.service = service
-
-    def start_async(self, request, args):
-        return self.executor.submit(self.resend, request, args)
-
-    def resend(self, request, args):
-
-        print("[Proxy]", request, args)
-
-        res = self.service.start_async(request, args).result()
-
-        print(res)
-
-        return res
-
-    @staticmethod
-    def serve(service: FlashService) -> "Proxy":
-        executor = futures.ThreadPoolExecutor(max_workers=1)
-        proxy = Proxy(executor, service)
-        return proxy
 
 
 if __name__ == '__main__':

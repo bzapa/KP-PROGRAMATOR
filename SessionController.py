@@ -44,7 +44,7 @@ class FlashService(object):
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                   shell=False)
-        return p.communicate(p)
+        return p.communicate()
 
 
 # class SessionController(object):
