@@ -5,10 +5,15 @@ from demo_store import get_files
 from message_utils import *
 from StreamParser import StreamParser
 
+import ast
+
+
 class BTServer(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, openocd_proxy):
         threading.Thread.__init__(self)
+
+        self.proxy = openocd_proxy
 
         self.uuid = "0446eb5c-d775-11ec-9d64-0242ac120002"
         self.client = None
@@ -17,8 +22,14 @@ class BTServer(threading.Thread):
         self.handlers = {
             CLEAR: lambda msg: None,
             GET_FILES_REQUEST: lambda msg: self.send(str(get_files()).encode(), JSON_DATA),
-            FLASH_REQUEST: lambda msg: print(msg[5:].decode("utf-8"))
+            FLASH_REQUEST: lambda msg: self.flash_request(msg[5:].decode("utf-8"))
         }
+
+    def flash_request(self, data):
+        print(data)
+        print(ast.literal_eval(data))
+        res = self.proxy.start_async("flash", ast.literal_eval(data))
+        self.send(str(res.result()).encode("utf-8"), LOG_TEXT)
 
     def run(self):
 

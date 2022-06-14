@@ -66,7 +66,7 @@ class PairThread(threading.Thread):
         try:
             self.state = AWAITING_CONNECTION
             self.display_text = "connect now"
-            child.expect("(yes/no)", timeout=20)
+            child.expect("(yes/no)", timeout=30)
             print(child.before)
             self.state = AWAITING_INPUT
             self.display_text = child.before[-17:-2]
@@ -78,9 +78,9 @@ class PairThread(threading.Thread):
         except:
             fail = True
         if fail:
-            self.display_text("not paired. pair again?")
+            self.display_text = "not paired. pair again?"
         else:
-            self.display_text("paired. pair again?")
+            self.display_text = "paired. pair again?"
         self.state = INACTIVE
 
     def notify(self, decision):

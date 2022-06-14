@@ -9,6 +9,9 @@ from gpiozero import Button
 
 import socket
 
+from bt_server import BTServer
+from request_handler import *
+from SessionController import FlashService
 
 class TimeMenuItem(MenuItem):
     def __init__(self):
@@ -51,6 +54,12 @@ class IpMenuItem(MenuItem):
 
 
 def main():
+    fs = FlashService()
+    requestHandler = RequestHandler.serve(fs)
+    proxy = Proxy.serve(requestHandler)
+    server = BTServer(proxy)
+    server.start()
+
     disp = Adafruit_SSD1306.SSD1306_128_32(rst=24)
     btn_select = Button(26, pull_up=True)
     btn_down = Button(19, pull_up=True)
