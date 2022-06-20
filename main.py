@@ -9,6 +9,7 @@ from gpiozero import Button
 
 import socket
 
+from demo_store import get_files
 from bt_server import BTServer
 from request_handler import *
 from SessionController import FlashService
@@ -52,6 +53,14 @@ class IpMenuItem(MenuItem):
         except:
             return "Get IP error"
 
+class ProgramFlashMenuItem(MenuItem):
+    def __init__(self, file_name, proxy):
+        self.file_name = file_name
+        self.proxy = proxy
+        MenuItem.__init__(self, file_name)
+
+    def on_click(self, select=True):
+        self.proxy.start_async("flash", { 'board': 'rp2040.cfg', 'target': self.file_name })
 
 def main():
     fs = FlashService()
@@ -66,18 +75,18 @@ def main():
     btn_up = Button(13, pull_up=True)
     btn_back = Button(6, pull_up=True)
 
-    menu = Menu([
+    menu_items = [
         TimeMenuItem(),
         PairDialog(),
         IpMenuItem(),
         CounterMenuItem(),
         MenuItem("1 button"),
-        MenuItem("2 button"),
-        MenuItem("3 button"),
-        MenuItem("4 button"),
-        MenuItem("5 button"),
-        MenuItem("6 button"),
-    ])
+    ]
+
+    for file_name in get_files()['binary']:
+        menu_items.append(ProgramFlashMenuItem(file_name, proxy))
+
+    menu = Menu(menu_items)
 
     btn_up.when_pressed = menu.on_up_btn
     btn_down.when_pressed = menu.on_down_btn
